@@ -2,7 +2,7 @@ let x = document.querySelector(".x")
 let o = document.querySelector(".o")
 
 let boxes = document.querySelectorAll(".box")
-let button = document.querySelectorAll("#buttons-container button")
+let buttons = document.querySelectorAll("#buttons-container button")
 let messageContainer = document.querySelector("#message")
 let messageText = document.querySelector("#message p")
 let secondPlayer
@@ -31,10 +31,33 @@ for (let i = 0; i < boxes.length; i++) {
 
             if (player1 == player2) {
                 player1++
+
+                if(secondPlayer == 'ai-player'){
+                    //função para executar a jogada
+                    computerPlay()
+                }
+                
             } else {
                 player2++
             }
         }
+
+    })
+}
+
+// evento para saber se é 2 players ou IA
+for(let i = 0; i<buttons.length;i++){
+    buttons[i].addEventListener("click", function() {
+        secondPlayer = this.getAttribute("id")
+
+        for(let j =0; j<buttons.length; j++){
+            buttons[j].style.display = 'none'
+        }
+
+        setTimeout(function(){
+            let container = document.querySelector("#container")
+            container.classList.remove("hide")
+        },500)
 
     })
 }
@@ -73,9 +96,9 @@ function checkWinCondition() {
         let b3Child = b3.childNodes[0].className
 
         if (b1Child == "x" && b2Child == "x" && b3Child == "x") {
-
+            declareWinner("x")
         } else if (b1Child == "o" && b2Child == "o" && b3Child == "o") {
-
+            declareWinner("o")
         }
 
     }
@@ -87,9 +110,9 @@ function checkWinCondition() {
         let b6Child = b6.childNodes[0].className
 
         if (b4Child == "x" && b5Child == "x" && b6Child == "x") {
-
+            declareWinner("x")
         } else if (b4Child == "o" && b5Child == "o" && b6Child == "o") {
-
+            declareWinner("o")
         }
 
     }
@@ -101,9 +124,9 @@ function checkWinCondition() {
         let b9Child = b9.childNodes[0].className
 
         if (b7Child == "x" && b8Child == "x" && b9Child == "x") {
-
+            declareWinner("x")
         } else if (b7Child == "o" && b8Child == "o" && b9Child == "o") {
-
+            declareWinner("o")
         }
     }
     //quadrados verticais
@@ -114,9 +137,9 @@ function checkWinCondition() {
         let b7Child = b7.childNodes[0].className
 
         if (b1Child == "x" && b4Child == "x" && b7Child == "x") {
-
+            declareWinner("x")
         } else if (b1Child == "o" && b4Child == "o" && b7Child == "o") {
-
+            declareWinner("o")
         }
 
     }
@@ -128,9 +151,9 @@ function checkWinCondition() {
         let b8Child = b8.childNodes[0].className
 
         if (b2Child == "x" && b5Child == "x" && b8Child == "x") {
-
+            declareWinner("x")
         } else if (b2Child == "o" && b5Child == "o" && b8Child == "o") {
-
+            declareWinner("o")
         }
 
     }
@@ -142,9 +165,9 @@ function checkWinCondition() {
         let b9Child = b9.childNodes[0].className
 
         if (b3Child == "x" && b6Child == "x" && b9Child == "x") {
-
+            declareWinner("x")
         } else if (b3Child == "o" && b6Child == "o" && b9Child == "o") {
-
+            declareWinner("o")
         }
 
     }
@@ -157,9 +180,9 @@ function checkWinCondition() {
         let b9Child = b9.childNodes[0].className
 
         if (b1Child == "x" && b5Child == "x" && b9Child == "x") {
-
+            declareWinner("x")
         } else if (b1Child == "o" && b5Child == "o" && b9Child == "o") {
-
+            declareWinner("o")
         }
 
     }
@@ -170,9 +193,9 @@ function checkWinCondition() {
         let b7Child = b7.childNodes[0].className
 
         if (b3Child == "x" && b5Child == "x" && b7Child == "x") {
-
+            declareWinner("x")
         } else if (b3Child == "o" && b5Child == "o" && b7Child == "o") {
-
+            declareWinner("o")
         }
 
     }
@@ -187,9 +210,79 @@ function checkWinCondition() {
     }
 
     if (counter == 9) {
+        declareWinner('Deu velha!')
+    }
+
+
+}
+
+// limpa o jogo, declara o vencedor e atualiza o placar
+function declareWinner(winner) {
+    let scoreboardX = document.querySelector("#scoreboard-1")
+    let scoreboardY = document.querySelector("#scoreboard-2")
+
+    let msg = ''
+
+    if (winner == "x"){
+        scoreboardX.textContent = parseInt(scoreboardX.textContent) + 1
+        msg = "O jogador 1 venceu!"
+    } else if(winner == "o"){
+        scoreboardY.textContent = parseInt(scoreboardY.textContent) + 1
+        msg = "O jogador 2 venceu!"
+    }else {
+        msg = "Deu velha!"
+    }
+    
+    //exibe a mensagem na tela
+    
+    messageText = msg
+    messageContainer.classList.remove('hide')
+    
+    //esconde msg
+    setTimeout(function() {
+        messageContainer.classList.add("hide")
+    },3000)
+    
+    //zera as jogadas
+    player1 = 0
+    player2 = 0
+    
+    // remove x e o
+    let boxesToRemove = document.querySelectorAll(".box div")
+    
+    for( let i = 0; i<boxesToRemove.length; i++){
+        boxesToRemove[i].parentNode.removeChild(boxesToRemove[i])
+    }
+}
+
+//executa a lógica da jogada do CPU
+function computerPlay(){
+
+    let cloneO = o.cloneNode(true)
+    counter = 0
+    filled = 0
+
+    for (let i = 0; i < boxes.length; i++) {
+        let randomNumber = Math.floor(Math.random() * 5)
+
+
+        // só preencher se estiver vazio o filho
+        if(boxes[i].childNodes[0] == undefined){
+            if(randomNumber <=1){
+                boxes[i].appendChild(cloneO)
+                counter++
+                break
+            }
+            //checagem de quantas estão preenchidas
+        } else {
+            filled++
+        }
         
     }
 
+    if(counter == 0 && filled< 0 ){
+        computerPlay()
+    }
 
 }
 
